@@ -16,9 +16,9 @@ class Player(pygame.sprite.Sprite):
         self.gravity = 0
         self.player_index = 0
 
-        self.player_walk = [player_walk_1,player_walk_2]
+        self.player_walk = [player_walk_1, player_walk_2]
         self.image = self.player_walk[self.player_index]
-        self.rect = self.image.get_rect(midbottom = (80, self.floor))
+        self.rect = self.image.get_rect(midbottom=(80, self.floor))
 
     def player_input(self):
         keys = pygame.key.get_pressed()
@@ -29,19 +29,23 @@ class Player(pygame.sprite.Sprite):
     def apply_gravity(self):
         self.gravity += 1
         self.rect.y += self.gravity
-        if self.rect.bottom >= self.floor: self.rect.bottom = self.floor
+        if self.rect.bottom >= self.floor:
+            self.rect.bottom = self.floor
 
     def player_animation(self):
-        if self.rect.bottom < self.floor: self.image = self.player_jump
-        else: 
+        if self.rect.bottom < self.floor:
+            self.image = self.player_jump
+        else:
             self.player_index += 0.1
-            if self.player_index >= len(self.player_walk):self.player_index = 0
+            if self.player_index >= len(self.player_walk):
+                self.player_index = 0
             self.image = self.player_walk[int(self.player_index)]
 
     def update(self):
         self.player_input()
         self.apply_gravity()
         self.player_animation()
+
 
 class Dog(pygame.sprite.Sprite):
     def __init__(self, type):
@@ -51,18 +55,20 @@ class Dog(pygame.sprite.Sprite):
             dog_1 = pygame.image.load('graphics/dog/dogBrown.png').convert_alpha()
             dog_2 = pygame.image.load('graphics/dog/dogBrownJump.png').convert_alpha()
             dog_3 = pygame.image.load('graphics/dog/dogBrownBend.png').convert_alpha()
-        else: pass
+        else:
+            pass
         self.frames = [dog_1, dog_2, dog_3]
         self.index = 0
         y_pos = 300
-            
+
         self.index = 0
         self.image = self.frames[self.index]
-        self.rect = self.image.get_rect(midbottom = (randint(900,1100), y_pos))
+        self.rect = self.image.get_rect(midbottom=(randint(900, 1100), y_pos))
 
     def obstacle_animation(self):
         self.index += 0.1
-        if self.index >= len(self.frames): self.index = 0
+        if self.index >= len(self.frames):
+            self.index = 0
         self.image = self.frames[int(self.index)]
 
     def update(self):
@@ -74,31 +80,33 @@ class Dog(pygame.sprite.Sprite):
         if self.rect.x <= -100:
             self.kill()
 
+
 class Obstacle(pygame.sprite.Sprite):
-    def __init__(self,type):
+    def __init__(self, type):
         super().__init__()
 
         if type == 'fly':
             fly_1 = pygame.image.load('graphics/fly/fly1.png').convert_alpha()
             fly_2 = pygame.image.load('graphics/fly/fly2.png').convert_alpha()
-            self.frames = [fly_1,fly_2]
+            self.frames = [fly_1, fly_2]
             self.index = 0
             y_pos = 190
         else:
             poo_1 = pygame.image.load('graphics/poo/poo_1.png').convert_alpha()
             poo_2 = pygame.image.load('graphics/poo/poo_2.png').convert_alpha()
-            self.frames = [poo_1,poo_2]
+            self.frames = [poo_1, poo_2]
             self.index = 0
             y_pos = 300
             self.squelch = pygame.mixer.Sound('audio/flyswatter2.wav')
 
         self.index = 0
         self.image = self.frames[self.index]
-        self.rect = self.image.get_rect(midbottom = (randint(900,1100), y_pos))
+        self.rect = self.image.get_rect(midbottom=(randint(900, 1100), y_pos))
 
     def obstacle_animation(self):
         self.index += 0.1
-        if self.index >= len(self.frames): self.index = 0
+        if self.index >= len(self.frames):
+            self.index = 0
         self.image = self.frames[int(self.index)]
 
     def update(self):
@@ -127,7 +135,7 @@ title = 'Riaan Run'
 pygame.display.set_caption(f'{title}')
 bg_music = pygame.mixer.Sound('audio/music.wav')
 bg_music.set_volume(0.1)
-bg_music.play(loops = -1)
+bg_music.play(loops=-1)
 clock = pygame.time.Clock()
 font = pygame.font.Font('fonts/Pixeltype.ttf', 50)
 game_active = False
@@ -148,10 +156,11 @@ ground_surf = pygame.image.load('graphics/Ground.png').convert()
 heart_image = pygame.image.load('graphics/heartFull.png').convert_alpha()
 squelch_sound = pygame.mixer.Sound('audio/flyswatter2.wav')
 
+
 def display_lives(lives):
     lives_x = [500, 550, 600, 650, 700]
     for life in lives:
-        life_rect = heart_image.get_rect(bottomleft = (lives_x[life], SCREEN_HEIGHT-17))
+        life_rect = heart_image.get_rect(bottomleft=(lives_x[life], SCREEN_HEIGHT-17))
         screen.blit(heart_image, life_rect)
 
 
@@ -159,53 +168,57 @@ def display_timer():
     global current_timer
     current_timer = (pygame.time.get_ticks() - start_time)//1000
     timer_surf = font.render(f'{current_timer}', False, 'red')
-    timer_rect = timer_surf.get_rect(center = (SCREEN_WIDTH//2, 30))
+    timer_rect = timer_surf.get_rect(center=(SCREEN_WIDTH//2, 30))
     screen.blit(timer_surf, timer_rect)
+
 
 def collision_sprite():
     global lives
     global score
-    if pygame.sprite.spritecollide(player.sprite, obstacle_group,True):
-        if len(lives)>1:
+    if pygame.sprite.spritecollide(player.sprite, obstacle_group, True):
+        if len(lives) > 1:
             squelch_sound.play()
             lives.pop()
             return True
-        else: return False
+        else:
+            return False
     elif pygame.sprite.spritecollide(player.sprite, dog_group, True):
         score += 1
-        if (len(lives) < 5) and (score % 10 ==0):
-            lives.append(lives[-1] +1)
+        if (len(lives) < 5) and (score % 10 == 0):
+            lives.append(lives[-1] + 1)
         return True
-    
-    else: return True
+    else:
+        return True
+
 
 def splash_screen():
     global current_timer
     global score
     player_stand = pygame.image.load('graphics/player/player_stand.png').convert_alpha()
     player_stand = pygame.transform.rotozoom(player_stand, 0, 2)
-    player_stand_rect = player_stand.get_rect(center = (SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
+    player_stand_rect = player_stand.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
     title_surf = font.render(f'{title}', False, BONE)
-    title_rect = title_surf.get_rect(center = (SCREEN_WIDTH//2, player_stand_rect.top - 20 - title_surf.get_height()//2))
+    title_rect = title_surf.get_rect(center=(SCREEN_WIDTH//2, player_stand_rect.top - 20 - title_surf.get_height()//2))
     screen.blit(title_surf, title_rect)
     screen.blit(player_stand, player_stand_rect)
-    if current_timer == 0:  
+    if current_timer == 0:
         instruction_surf = font.render('Press any key to start!', False, BONE)
-        instruction_rect = instruction_surf.get_rect(center = (SCREEN_WIDTH//2, player_stand_rect.bottom + 20 + instruction_surf.get_height()//2))
+        instruction_rect = instruction_surf.get_rect(center=(SCREEN_WIDTH//2, player_stand_rect.bottom + 20 + instruction_surf.get_height()//2))
         screen.blit(instruction_surf, instruction_rect)
-    else: 
+    else:
         game_over_score_surf = font.render(f'Your score was {score} in {current_timer} seconds', False, BONE)
-        game_over_score_rect = game_over_score_surf.get_rect(center = (SCREEN_WIDTH//2, player_stand_rect.bottom + 20 + game_over_score_surf.get_height()//2))
+        game_over_score_rect = game_over_score_surf.get_rect(center=(SCREEN_WIDTH//2, player_stand_rect.bottom + 20 + game_over_score_surf.get_height()//2))
         screen.blit(game_over_score_surf, game_over_score_rect)
-        
+
 
 def display_score(score):
     score_surf = font.render(str(score), False, BONE)
-    score_rect = score_surf.get_rect(bottomleft = (20, SCREEN_HEIGHT - 30))
+    score_rect = score_surf.get_rect(bottomleft=(20, SCREEN_HEIGHT - 30))
     shadow_surf = font.render(str(score), False, SHADOW)
-    shadow_rect = shadow_surf.get_rect(bottomleft = (22, SCREEN_HEIGHT - 28))
+    shadow_rect = shadow_surf.get_rect(bottomleft=(22, SCREEN_HEIGHT - 28))
     screen.blit(shadow_surf, shadow_rect)
-    screen.blit(score_surf,score_rect)
+    screen.blit(score_surf, score_rect)
+
 
 while True:
     for event in pygame.event.get():
@@ -223,13 +236,11 @@ while True:
                 start_time = pygame.time.get_ticks()
                 score = 0
                 lives = [0, 1, 2]
-                
 
+    if game_active:
+        screen.blit(sky_surf, (0, 0))
+        screen.blit(ground_surf, (0, SCREEN_HEIGHT - ground_surf.get_height() // 1.5))
 
-    if game_active: 
-        screen.blit(sky_surf,(0, 0))
-        screen.blit(ground_surf,(0, SCREEN_HEIGHT - ground_surf.get_height()//1.5))
-       
         display_timer()
         display_score(score)
         display_lives(lives)
@@ -242,18 +253,11 @@ while True:
         obstacle_group.update()
         dog_group.update()
 
-        
-
         game_active = collision_sprite()
 
     else:
         screen.fill((94, 129, 162))
         splash_screen()
 
-   
-      
-        
-
     pygame.display.update()
     clock.tick(60)
- 
