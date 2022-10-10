@@ -19,8 +19,6 @@ class Player(pygame.sprite.Sprite):
         self.player_walk = [player_walk_1,player_walk_2]
         self.image = self.player_walk[self.player_index]
         self.rect = self.image.get_rect(midbottom = (80, self.floor))
-        
-        
 
     def player_input(self):
         keys = pygame.key.get_pressed()
@@ -92,6 +90,7 @@ class Obstacle(pygame.sprite.Sprite):
             self.frames = [poo_1,poo_2]
             self.index = 0
             y_pos = 300
+            self.squelch = pygame.mixer.Sound('audio/flyswatter2.wav')
 
         self.index = 0
         self.image = self.frames[self.index]
@@ -112,7 +111,6 @@ class Obstacle(pygame.sprite.Sprite):
             self.kill()
 
 
-
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 400
 SHADOW = (64, 64, 64)
@@ -124,6 +122,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 global title
 global current_timer
 global score
+global lives
 title = 'Riaan Run'
 pygame.display.set_caption(f'{title}')
 bg_music = pygame.mixer.Sound('audio/music.wav')
@@ -147,11 +146,12 @@ lives_group = pygame.sprite.Group()
 sky_surf = pygame.image.load('graphics/Sky.png').convert()
 ground_surf = pygame.image.load('graphics/Ground.png').convert()
 heart_image = pygame.image.load('graphics/heartFull.png').convert_alpha()
+squelch_sound = pygame.mixer.Sound('audio/flyswatter2.wav')
 
 def display_lives(lives):
-    lives_x = [600, 650, 700]
+    lives_x = [500, 550, 600, 650, 700]
     for life in lives:
-        life_rect = heart_image.get_rect(center = (lives_x[life], SCREEN_HEIGHT-30))
+        life_rect = heart_image.get_rect(bottomleft = (lives_x[life], SCREEN_HEIGHT-17))
         screen.blit(heart_image, life_rect)
 
 
@@ -167,11 +167,14 @@ def collision_sprite():
     global score
     if pygame.sprite.spritecollide(player.sprite, obstacle_group,True):
         if len(lives)>1:
+            squelch_sound.play()
             lives.pop()
             return True
         else: return False
     elif pygame.sprite.spritecollide(player.sprite, dog_group, True):
         score += 1
+        if (len(lives) < 5) and (score % 10 ==0):
+            lives.append(lives[-1] +1)
         return True
     
     else: return True
